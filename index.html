@@ -16,6 +16,9 @@
     <section>
         <input type="range" class="js-line-range" min="1" max="72" value="1">
         <label class="js-range-value">1</label>Px
+        <input type="button" id="limpiar" value="limpiar" style="margin-left: 4em">
+        <input id="borrador" type="checkbox" name="borrador" style="margin-left: 4em"> <label
+            for="borrador">borrador</label>
     </section>
 
     <canvas class="js-paint  paint-canvas" width="600" height="300"></canvas>
@@ -34,6 +37,8 @@
 
     const colorPicker = document.querySelector('.js-color-picker');
 
+    const cleanCanvasInput = document.querySelector('#limpiar')
+
     colorPicker.addEventListener('change', (event) => {
         context.strokeStyle = event.target.value;
     });
@@ -47,8 +52,11 @@
         context.lineWidth = width;
     });
 
+    let erasing = false;
     let x = 0, y = 0;
     let isMouseDown = false;
+
+    const eraserCheckbox = document.querySelector('#borrador')
 
     const stopDrawing = () => { isMouseDown = false; }
     const startDrawing = event => {
@@ -57,6 +65,9 @@
     }
     const drawLine = event => {
         if (isMouseDown) {
+            prev = context.strokeStyle;
+            if (erasing)
+                context.strokeStyle = '#ffffff';
             const newX = event.offsetX;
             const newY = event.offsetY;
             context.beginPath();
@@ -66,6 +77,8 @@
             //[x, y] = [newX, newY];
             x = newX;
             y = newY;
+            if (erasing)
+                context.strokeStyle = prev;
         }
     }
 
@@ -73,6 +86,10 @@
     paintCanvas.addEventListener('mousemove', drawLine);
     paintCanvas.addEventListener('mouseup', stopDrawing);
     paintCanvas.addEventListener('mouseout', stopDrawing);
+
+    cleanCanvasInput.addEventListener('click', event => context.clearRect(0, 0, paintCanvas.clientWidth, paintCanvas.clientHeight))
+
+    eraserCheckbox.addEventListener('change', event => erasing = !erasing)
 
 </script>
 
